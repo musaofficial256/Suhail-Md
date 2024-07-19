@@ -1,21 +1,33 @@
-run = "npm start || yarn start || node ."
-# stop =  "npm stop || yarn stop"
-entrypoint = "config.js"
-hidden = [".config"]
+name: Node.js CI
 
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
+jobs:
+  build:
 
+    runs-on: ubuntu-latest
 
-[unitTest]
-language = "nodejs"
+    strategy:
+      matrix:
+        node-version: [20.x]
 
-onBoot = "npm i || yarn"
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-[nix]
-channel = "stable-23_05"
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
 
-[deployment]
-run = ["yarn","start"]
-deploymentTarget = "cloudrun"
-ignorePorts = false
- 
+    - name: Install dependencies
+      run: npm install
+
+    - name: Start application
+      run: npm start
